@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#070b14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Nova Calculator">
+<link rel="manifest" href="./manifest.json">
+<title>Nova Calculator V3</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+}
+
+:root {
+  --bg: #050814;
+  --panel: rgba(13, 19, 34, 0.9);
+  --panel2: #0a1020;
+  --key: #182238;
+  --text: #f8fafc;
+  --muted: #94a3b8;
+  --line: rgba(255,255,255,.08);
+  --accent: #3b82f6;
+  --danger: #ef4444;
+  --success: #22c55e;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 20% 10%, rgba(59,130,246,.16), transparent 30%),
+    radial-gradient(circle at 90% 90%, rgba(34,197,94,.10), transparent 28%),
+    var(--bg);
+  color: var(--text);
+  display: flex;
+  justify-content: center;
+  padding: 18px;
+}
+
+body.light {
+  --bg: #eef2f7;
+  --panel: rgba(255,255,255,.92);
+  --panel2: #f8fafc;
+  --key: #e2e8f0;
+  --text: #0f172a;
+  --muted: #64748b;
+  --line: rgba(15,23,42,.09);
+
+  background:
+    radial-gradient(circle at 15% 10%, rgba(59,130,246,.14), transparent 30%),
+    var(--bg);
+}
+
+.app {
+  width: min(100%, 480px);
+  animation: rise .5s ease both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.calculator {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 32px;
+  padding: 18px;
+  box-shadow: 0 28px 80px rgba(0,0,0,.32);
+  backdrop-filter: blur(24px);
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.brand {
+  font-size: 20px;
+  font-weight: 850;
+  letter-spacing: -.6px;
+}
+
+.brand small {
+  font-size: 10px;
+  opacity: .55;
+  margin-left: 5px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.icon {
+  border: 1px solid var(--line);
+  background: var(--key);
+  color: var(--text);
+  width: 40px;
+  height: 40px;
+  border-radius: 13px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.display-box {
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  border-radius: 23px;
+  padding: 17px 18px;
+  min-height: 132px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  margin-bottom: 11px;
+}
+
+.expression {
+  height: 23px;
+  color: var(--muted);
+  font-size: 13px;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.display {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  color: var(--text);
+  font-size: 43px;
+  font-weight: 750;
+  text-align: right;
+  letter-spacing: -1.5px;
+  margin-top: 5px;
+}
+
+.memory {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 7px;
+  margin-bottom: 8px;
+}
+
+.memory button,
+.scientific button {
+  height: 39px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--key);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.scientific {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 7px;
+  margin-bottom: 9px;
+}
+
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 9px;
+}
+
+.buttons button {
+  height: 60px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--key);
+  color: var(--text);
+  font-size: 19px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: .12s;
+}
+
+.buttons button:hover,
+.memory button:hover,
+.scientific button:hover,
+.icon:hover {
+  filter: brightness(1.12);
+}
+
+.buttons button:active,
+.memory button:active,
+.scientific button:active,
+.icon:active {
+  transform: scale(.96);
+}
+
+.operator {
+  background: #2458bd !important;
+  color: white !important;
+}
+
+.clear {
+  background: #c52d35 !important;
+  color: white !important;
+}
+
+.equals {
+  background: #149447 !important;
+  color: white !important;
+  grid-row: span 2;
+  height: 129px !important;
+}
+
+.zero {
+  grid-column: span 2;
+}
+
+.history {
+  margin-top: 11px;
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 13px;
+}
+
+.history-head {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.history-title {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.history-tools {
+  display: flex;
+  gap: 6px;
+}
+
+.search {
+  width: 100%;
+  margin-top: 9px;
+  background: var(--key);
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  padding: 9px 11px;
+  color: var(--text);
+  outline: 0;
+}
+
+.history-list {
+  max-height: 210px;
+  overflow: auto;
+  margin-top: 7px;
+}
+
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 2px;
+  border-bottom: 1px solid var(--line);
+  font-size: 12px;
+}
+
+.history-item span {
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.history-item strong {
+  white-space: nowrap;
+}
+
+.mini-clear {
+  border: 0;
+  background: var(--danger);
+  color: white;
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.empty {
+  padding: 15px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 22px;
+  transform: translate(-50%, 20px);
+  opacity: 0;
+  pointer-events: none;
+  background: #111827;
+  color: white;
+  border: 1px solid rgba(255,255,255,.12);
+  padding: 9px 13px;
+  border-radius: 12px;
+  font-size: 12px;
+  transition: .25s;
+  z-index: 10;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+@media (max-width: 390px) {
+  body {
+    padding: 9px;
+  }
+
+  .calculator {
+    padding: 13px;
+    border-radius: 25px;
+  }
+
+  .display {
+    font-size: 35px;
+  }
+
+  .buttons {
+    gap: 7px;
+  }
+
+  .buttons button {
+    height: 55px;
+  }
+
+  .equals {
+    height: 117px !important;
+  }
+
+  .scientific button,
+  .memory button {
+    font-size: 10px;
+    height: 37px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<main class="app">
+
+<section class="calculator">
+
+<header class="topbar">
+
+<div class="brand">
+Nova Calculator
+<small>V3</small>
+</div>
+
+<div class="actions">
+
+<button
+class="icon"
+onclick="copyResult()"
+aria-label="Copy result">
+⧉
+</button>
+
+<button
+class="icon"
+onclick="toggleTheme()"
+aria-label="Toggle theme">
+☀
+</button>
+
+</div>
+
+</header>
+
+<section class="display-box">
+
+<div id="expression" class="expression"></div>
+
+<input
+id="display"
+class="display"
+value="0"
+readonly
+>
+
+</section>
+
+<!-- MEMORY -->
+
+<section class="memory">
+
+<button onclick="memoryClear()">MC</button>
+<button onclick="memoryRecall()">MR</button>
+<button onclick="memoryAdd()">M+</button>
+<button onclick="memorySubtract()">M−</button>
+<button onclick="memoryStore()">MS</button>
+
+</section>
+
+<!-- SCIENTIFIC -->
+
+<section class="scientific">
+
+<button onclick="scientific('sin')">sin</button>
+<button onclick="scientific('cos')">cos</button>
+<button onclick="scientific('tan')">tan</button>
+<button onclick="scientific('asin')">sin⁻¹</button>
+<button onclick="scientific('acos')">cos⁻¹</button>
+
+<button onclick="scientific('atan')">tan⁻¹</button>
+<button onclick="scientific('sqrt')">√</button>
+<button onclick="scientific('square')">x²</button>
+<button onclick="scientific('factorial')">x!</button>
+<button onclick="scientific('pi')">π</button>
+
+<button onclick="scientific('log')">log</button>
+<button onclick="scientific('ln')">ln</button>
+<button onclick="scientific('power10')">10ˣ</button>
+<button onclick="scientific('exp')">EXP</button>
+<button onclick="scientific('sign')">±</button>
+
+</section>
+
+<!-- BASIC CALCULATOR -->
+
+<section class="buttons">
+
+<button class="clear" onclick="clearCalculator()">AC</button>
+<button onclick="deleteLast()">DEL</button>
+<button onclick="percentage()">%</button>
+<button class="operator" onclick="chooseOperator('/')">÷</button>
+
+<button onclick="inputNumber('7')">7</button>
+<button onclick="inputNumber('8')">8</button>
+<button onclick="inputNumber('9')">9</button>
+<button class="operator" onclick="chooseOperator('*')">×</button>
+
+<button onclick="inputNumber('4')">4</button>
+<button onclick="inputNumber('5')">5</button>
+<button onclick="inputNumber('6')">6</button>
+<button class="operator" onclick="chooseOperator('-')">−</button>
+
+<button onclick="inputNumber('1')">1</button>
+<button onclick="inputNumber('2')">2</button>
+<button onclick="inputNumber('3')">3</button>
+<button class="operator" onclick="chooseOperator('+')">+</button>
+
+<button class="zero" onclick="inputNumber('0')">0</button>
+<button onclick="inputDecimal()">.</button>
+<button class="equals" onclick="calculate()">=</button>
+
+</section>
+
+<!-- HISTORY -->
+
+<section class="history">
+
+<div class="history-head">
+
+<div class="history-title">
+Calculation History
+</div>
+
+<div class="history-tools">
+<button class="mini-clear" onclick="clearHistory()">
+Clear
+</button>
+</div>
+
+</div>
+
+<input
+id="historySearch"
+class="search"
+placeholder="Search history..."
+oninput="renderHistory()"
+>
+
+<div
+id="historyList"
+class="history-list">
+</div>
+
+</section>
+
+</section>
+</main>
+
+<div id="toast" class="toast"></div>
+
+<script>
+
+const display =
+document.getElementById("display");
+
+const expression =
+document.getElementById("expression");
+
+const historyList =
+document.getElementById("historyList");
+
+const historySearch =
+document.getElementById("historySearch");
+
+const toast =
+document.getElementById("toast");
+
+let firstNumber = null;
+let operator = null;
+let waitingForSecondNumber = false;
+
+let memory =
+Number(localStorage.getItem("novaMemory") || 0);
+
+let history =
+JSON.parse(
+localStorage.getItem("novaHistory") || "[]"
+);
+
+
+// ==============================
+// BASIC INPUT
+// ==============================
+
+function inputNumber(n) {
+
+  if (display.value === "Error") {
+    clearCalculator();
+  }
+
+  if (waitingForSecondNumber) {
+    display.value = n;
+    waitingForSecondNumber = false;
+    return;
+  }
+
+  display.value =
+    display.value === "0"
+      ? n
+      : display.value + n;
+}
+
+
+function inputDecimal() {
+
+  if (waitingForSecondNumber) {
+    display.value = "0.";
+    waitingForSecondNumber = false;
+    return;
+  }
+
+  if (!display.value.includes(".")) {
+    display.value += ".";
+  }
+}
+
+
+// ==============================
+// OPERATORS
+// ==============================
+
+function chooseOperator(op) {
+
+  if (display.value === "Error") return;
+
+  if (
+    operator !== null &&
+    !waitingForSecondNumber
+  ) {
+    calculate();
+  }
+
+  firstNumber =
+    parseFloat(display.value);
+
+  operator = op;
+
+  waitingForSecondNumber = true;
+
+  expression.textContent =
+    `${format(firstNumber)} ${symbol(op)}`;
+}
+
+
+// ==============================
+// CALCULATE
+// ==============================
+
+function calculate() {
+
+  if (
+    operator === null ||
+    firstNumber === null ||
+    waitingForSecondNumber
+  ) {
+    return;
+  }
+
+  const second =
+    parseFloat(display.value);
+
+  let result;
+
+  if (operator === "+") {
+    result = firstNumber + second;
+  }
+
+  if (operator === "-") {
+    result = firstNumber - second;
+  }
+
+  if (operator === "*") {
+    result = firstNumber * second;
+  }
+
+  if (operator === "/") {
+
+    if (second === 0) {
+      error("Cannot divide by zero");
+      return;
+    }
+
+    result = firstNumber / second;
+  }
+
+  const calc =
+    `${format(firstNumber)} ${symbol(operator)} ${format(second)}`;
+
+  const out =
+    format(result);
+
+  display.value = out;
+
+  expression.textContent =
+    `${calc} =`;
+
+  addHistory(calc, out);
+
+  firstNumber = result;
+
+  operator = null;
+
+  waitingForSecondNumber = true;
+}
+
+
+// ==============================
+// EXTRA BASIC
+// ==============================
+
+function percentage() {
+
+  const n =
+    parseFloat(display.value);
+
+  if (!isNaN(n)) {
+    display.value = format(n / 100);
+  }
+}
+
+
+function deleteLast() {
+
+  if (
+    display.value === "Error" ||
+    display.value.length <= 1
+  ) {
+    display.value = "0";
+    return;
+  }
+
+  display.value =
+    display.value.slice(0, -1);
+}
+
+
+function clearCalculator() {
+
+  display.value = "0";
+
+  expression.textContent = "";
+
+  firstNumber = null;
+
+  operator = null;
+
+  waitingForSecondNumber = false;
+}
+
+
+// ==============================
+// SCIENTIFIC
+// ==============================
+
+function scientific(type) {
+
+  const n =
+    parseFloat(display.value);
+
+  if (isNaN(n)) return;
+
+  let r;
+  let label;
+
+  if (type === "sin") {
+    r = Math.sin(n * Math.PI / 180);
+    label = `sin(${n}°)`;
+  }
+
+  if (type === "cos") {
+    r = Math.cos(n * Math.PI / 180);
+    label = `cos(${n}°)`;
+  }
+
+  if (type === "tan") {
+
+    const a =
+      n * Math.PI / 180;
+
+    if (Math.abs(Math.cos(a)) < 1e-12) {
+      error("tan is undefined at this angle");
+      return;
+    }
+
+    r = Math.tan(a);
+    label = `tan(${n}°)`;
+  }
+
+  if (type === "asin") {
+
+    if (n < -1 || n > 1) {
+      error("sin⁻¹ input must be between −1 and 1");
+      return;
+    }
+
+    r =
+      Math.asin(n) * 180 / Math.PI;
+
+    label = `sin⁻¹(${n})`;
+  }
+
+  if (type === "acos") {
+
+    if (n < -1 || n > 1) {
+      error("cos⁻¹ input must be between −1 and 1");
+      return;
+    }
+
+    r =
+      Math.acos(n) * 180 / Math.PI;
+
+    label = `cos⁻¹(${n})`;
+  }
+
+  if (type === "atan") {
+
+    r =
+      Math.atan(n) * 180 / Math.PI;
+
+    label = `tan⁻¹(${n})`;
+  }
+
+  if (type === "sqrt") {
+
+    if (n < 0) {
+      error("√ input must be non-negative");
+      return;
+    }
+
+    r = Math.sqrt(n);
+
+    label = `√(${n})`;
+  }
+
+  if (type === "square") {
+
+    r = n * n;
+
+    label = `${n}²`;
+  }
+
+  if (type === "factorial") {
+
+    if (
+      n < 0 ||
+      !Number.isInteger(n) ||
+      n > 170
+    ) {
+      error(
+        "Factorial needs an integer from 0 to 170"
+      );
+      return;
+    }
+
+    r = factorial(n);
+
+    label = `${n}!`;
+  }
+
+  if (type === "pi") {
+
+    r = Math.PI;
+
+    label = "π";
+  }
+
+  if (type === "log") {
+
+    if (n <= 0) {
+      error(
+        "log input must be greater than 0"
+      );
+      return;
+    }
+
+    r = Math.log10(n);
+
+    label = `log(${n})`;
+  }
+
+  if (type === "ln") {
+
+    if (n <= 0) {
+      error(
+        "ln input must be greater than 0"
+      );
+      return;
+    }
+
+    r = Math.log(n);
+
+    label = `ln(${n})`;
+  }
+
+  if (type === "power10") {
+
+    r = Math.pow(10, n);
+
+    label = `10^${n}`;
+  }
+
+  if (type === "exp") {
+
+    r = Math.exp(n);
+
+    label = `e^${n}`;
+  }
+
+  if (type === "sign") {
+
+    r = -n;
+
+    label = `±${n}`;
+  }
+
+  if (!Number.isFinite(r)) {
+    error("Invalid calculation");
+    return;
+  }
+
+  const out =
+    format(r);
+
+  display.value = out;
+
+  expression.textContent =
+    `${label} =`;
+
+  addHistory(label, out);
+
+  waitingForSecondNumber = true;
+}
+
+
+function factorial(n) {
+
+  let r = 1;
+
+  for (let i = 2; i <= n; i++) {
+    r *= i;
+  }
+
+  return r;
+}
+
+
+// ==============================
+// ERROR
+// ==============================
+
+function error(msg) {
+
+  display.value = "Error";
+
+  expression.textContent = msg;
+
+  firstNumber = null;
+
+  operator = null;
+
+  waitingForSecondNumber = false;
+
+  notify(msg);
+}
+
+
+// ==============================
+// FORMAT
+// ==============================
+
+function format(n) {
+
+  if (!Number.isFinite(n)) {
+    return "Error";
+  }
+
+  return Number(
+    n.toFixed(10)
+  ).toString();
+}
+
+
+function symbol(op) {
+
+  return {
+    "+": "+",
+    "-": "−",
+    "*": "×",
+    "/": "÷"
+  }[op] || op;
+}
+
+
+// ==============================
+// HISTORY
+// ==============================
+
+function addHistory(
+  calculation,
+  result
+) {
+
+  history.unshift({
+    calculation,
+    result,
+    time: Date.now()
+  });
+
+  if (history.length > 100) {
+    history =
+      history.slice(0, 100);
+  }
+
+  localStorage.setItem(
+    "novaHistory",
+    JSON.stringify(history)
+  );
+
+  renderHistory();
+}
+
+
+function renderHistory() {
+
+  const q =
+    historySearch.value
+      .trim()
+      .toLowerCase();
+
+  historyList.replaceChildren();
+
+  const items =
+    history.filter(x =>
+      (
+        x.calculation +
+        " " +
+        x.result
+      )
+      .toLowerCase()
+      .includes(q)
+    );
+
+  if (!items.length) {
+
+    const empty =
+      document.createElement("div");
+
+    empty.className = "empty";
+
+    empty.textContent =
+      history.length
+        ? "No matching calculations"
+        : "No calculations yet";
+
+    historyList.appendChild(empty);
+
+    return;
+  }
+
+  items.forEach(item => {
+
+    const row =
+      document.createElement("div");
+
+    const a =
+      document.createElement("span");
+
+    const b =
+      document.createElement("strong");
+
+    row.className =
+      "history-item";
+
+    a.textContent =
+      item.calculation;
+
+    b.textContent =
+      item.result;
+
+    row.append(a, b);
+
+    historyList.appendChild(row);
+  });
+}
+
+
+function clearHistory() {
+
+  history = [];
+
+  localStorage.removeItem(
+    "novaHistory"
+  );
+
+  renderHistory();
+
+  notify("History cleared");
+}
+
+
+// ==============================
+// MEMORY
+// ==============================
+
+function memoryStore() {
+
+  const n =
+    parseFloat(display.value);
+
+  if (!isNaN(n)) {
+
+    memory = n;
+
+    saveMemory();
+
+    notify("Memory stored");
+  }
+}
+
+
+function memoryRecall() {
+
+  display.value =
+    format(memory);
+
+  waitingForSecondNumber = true;
+
+  notify("Memory recalled");
+}
+
+
+function memoryAdd() {
+
+  const n =
+    parseFloat(display.value);
+
+  if (!isNaN(n)) {
+
+    memory += n;
+
+    saveMemory();
+
+    notify("Added to memory");
+  }
+}
+
+
+function memorySubtract() {
+
+  const n =
+    parseFloat(display.value);
+
+  if (!isNaN(n)) {
+
+    memory -= n;
+
+    saveMemory();
+
+    notify("Subtracted from memory");
+  }
+}
+
+
+function memoryClear() {
+
+  memory = 0;
+
+  saveMemory();
+
+  notify("Memory cleared");
+}
+
+
+function saveMemory() {
+
+  localStorage.setItem(
+    "novaMemory",
+    String(memory)
+  );
+}
+
+
+// ==============================
+// COPY
+// ==============================
+
+async function copyResult() {
+
+  if (display.value === "Error") {
+    return;
+  }
+
+  try {
+
+    await navigator.clipboard.writeText(
+      display.value
+    );
+
+    notify("Copied");
+
+  } catch (e) {
+
+    notify("Copy unavailable");
+  }
+}
+
+
+// ==============================
+// THEME
+// ==============================
+
+function toggleTheme() {
+
+  document.body.classList.toggle("light");
+
+  localStorage.setItem(
+    "novaTheme",
+    document.body.classList.contains("light")
+      ? "light"
+      : "dark"
+  );
+}
+
+
+if (
+  localStorage.getItem("novaTheme")
+  === "light"
+) {
+  document.body.classList.add("light");
+}
+
+
+// ==============================
+// TOAST
+// ==============================
+
+let toastTimer;
+
+function notify(msg) {
+
+  toast.textContent = msg;
+
+  toast.classList.add("show");
+
+  clearTimeout(toastTimer);
+
+  toastTimer =
+    setTimeout(
+      () => toast.classList.remove("show"),
+      1500
+    );
+}
+
+
+// ==============================
+// KEYBOARD
+// ==============================
+
+document.addEventListener(
+  "keydown",
+  e => {
+
+    if (e.key >= "0" && e.key <= "9") {
+      inputNumber(e.key);
+    }
+
+    else if (e.key === ".") {
+      inputDecimal();
+    }
+
+    else if (
+      ["+", "-", "*", "/"].includes(e.key)
+    ) {
+      chooseOperator(e.key);
+    }
+
+    else if (
+      e.key === "Enter" ||
+      e.key === "="
+    ) {
+      calculate();
+    }
+
+    else if (e.key === "Backspace") {
+      deleteLast();
+    }
+
+    else if (e.key === "Escape") {
+      clearCalculator();
+    }
+
+    else if (e.key === "%") {
+      percentage();
+    }
+  }
+);
+
+
+// ==============================
+// INITIALIZE
+// ==============================
+
+renderHistory();
+
+
+// ==============================
+// PWA SERVICE WORKER
+// ==============================
+
+if ("serviceWorker" in navigator) {
+
+  window.addEventListener(
+    "load",
+    () => {
+
+      navigator.serviceWorker
+        .register("./sw.js")
+        .catch(() => {});
+
+    }
+  );
+}
+
+</script>
+
+</body>
+</html>
